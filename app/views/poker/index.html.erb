@@ -1,0 +1,14 @@
+<h1>ポーカー役判定</h1>
+
+<!-- 入力フォーム -->
+<form action="/" method="post">
+  <label for="cards">手札 (カンマ区切り):</label>
+  <input type="text" name="cards" id="cards" placeholder="AS, KS, QS, JS, 10S">
+  <input type="submit" value="判定する">
+</form>
+
+<!-- 判定結果表示 -->
+<% if @result %>
+  <p>手札: <%= @cards.join(', ') %></p>
+  <p>判定結果: <%= @result %></p>
+<% end %>
