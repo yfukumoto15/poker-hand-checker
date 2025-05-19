@@ -79,7 +79,7 @@ group :development, :test do
 
   # RSpecテストフレームワーク
   # Railsアプリの単体テストや統合テストに利用されます。
-  gem "rspec-rails", "~> 5.0"
+  gem "rspec-rails", "~> 8.0"
 end
 
 # 開発環境専用のGemをグループ化
