@@ -1,68 +1,98 @@
+# GemfileはRailsアプリケーションで使用する外部ライブラリ（Gem）を管理するファイルです。
+# BundlerというツールがGemfileを参照し、指定されたGemをインストール・管理します。
+
+# GemをダウンロードするためのソースURLを指定
 source "https://rubygems.org"
 
-# Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
+# Railsフレームワークのバージョンを指定
+# ~> 8.0.2 は、8.0.2以上8.1未満の最新版を意味します。
 gem "rails", "~> 8.0.2"
-# The modern asset pipeline for Rails [https://github.com/rails/propshaft]
+
+# 最新のアセットパイプラインを提供するGem
+# Rails 7以降で使われるPropshaftを利用し、CSSやJavaScriptを管理します。
 gem "propshaft"
-# Use sqlite3 as the database for Active Record
+
+# データベースとしてSQLite3を使用
+# 開発・テスト環境では手軽なデータベースとして利用されます。
 gem "sqlite3", ">= 2.1"
-# Use the Puma web server [https://github.com/puma/puma]
+
+# WebサーバーとしてPumaを使用
+# マルチスレッド対応で、高速かつ軽量なWebサーバーです。
 gem "puma", ">= 5.0"
-# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
+
+# JavaScriptモジュール管理を行うためのGem
+# モダンなJavaScript管理をサポートし、ESM（ECMAScriptモジュール）に対応しています。
 gem "importmap-rails"
-# Grape for API development
-gem "grape"    # ここに追加
-# Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
+
+# API作成を容易にするためのGrapeフレームワーク
+# RESTfulなAPIを簡単に作成・管理できます。
+gem "grape"
+
+# SPA（シングルページアプリケーション）を支援するためのGem
+# Turboを使ってページ遷移を高速化し、ユーザー体験を向上させます。
 gem "turbo-rails"
-# Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
+
+# シンプルなJavaScriptフレームワークで、UI操作を支援します。
+# Turboと組み合わせて動的なWebアプリケーションを作成可能です。
 gem "stimulus-rails"
-# Build JSON APIs with ease [https://github.com/rails/jbuilder]
+
+# JSON形式のレスポンスを生成するためのGem
+# APIレスポンスをJSON形式で返す際に便利です。
 gem "jbuilder"
 
-# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+# Windows環境での時刻管理に使用されるGem
+# tzinfo-dataはタイムゾーン情報を扱うために使います。
+gem "tzinfo-data", platforms: %i[mingw jruby]
 
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem "tzinfo-data", platforms: %i[ mingw jruby ]
-
-# Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
+# キャッシュ管理に使われるGem
 gem "solid_cache"
+# ジョブキュー管理を行うGem
 gem "solid_queue"
+# Webソケットを使ったリアルタイム通信を管理するGem
 gem "solid_cable"
 
-# Reduces boot times through caching; required in config/boot.rb
+# アプリケーションの起動を高速化するためのGem
+# キャッシュを利用して、起動時間を短縮します。
 gem "bootsnap", require: false
 
-# Deploy this application anywhere as a Docker container [https://kamal-deploy.org]
+# Dockerコンテナでのデプロイを支援するGem
+# Kamalはシンプルなデプロイツールです。
 gem "kamal", require: false
 
-# Add HTTP asset caching/compression and X-Sendfile acceleration to Puma [https://github.com/basecamp/thruster/]
+# PumaサーバーのHTTPキャッシュや圧縮をサポートするGem
+# 高速なレスポンスを提供するために使用します。
 gem "thruster", require: false
 
-# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
-
+# 開発環境およびテスト環境で利用するGemをグループ化
 group :development, :test do
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
-  gem "debug", platforms: %i[ mri mingw ], require: "debug/prelude"
+  # デバッグ用のGem
+  # プログラムの途中で値を確認したり、エラーを調査する際に使います。
+  gem "debug", platforms: %i[mri mingw], require: "debug/prelude"
 
-  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
+  # コードのセキュリティチェックを自動化するGem
+  # 脆弱性を検出し、安全なコードに改善するために使います。
   gem "brakeman", require: false
 
-  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
+  # コードスタイルを自動チェックするGem
+  # Rubyコードをきれいに保つためのツールです。
   gem "rubocop-rails-omakase", require: false
 
-  # Add RSpec for testing
+  # RSpecテストフレームワーク
+  # Railsアプリの単体テストや統合テストに利用されます。
   gem "rspec-rails", "~> 5.0"
 end
 
+# 開発環境専用のGemをグループ化
 group :development do
-  # Use console on exceptions pages [https://github.com/rails/web-console]
+  # Webコンソールを表示するためのGem
+  # エラー発生時にインタラクティブにデバッグできる便利なツールです。
   gem "web-console"
 end
 
+# テスト環境専用のGemをグループ化
 group :test do
-  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
+  # E2E（エンドツーエンド）テストをサポートするGem
+  # 実際のブラウザ操作を自動化し、ユーザー操作を検証します。
   gem "capybara"
   gem "selenium-webdriver"
 end

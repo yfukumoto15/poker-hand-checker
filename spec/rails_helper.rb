@@ -1,73 +1,73 @@
-# This file is copied to spec/ when you run 'rails generate rspec:install'
-require 'spec_helper'
-ENV['RAILS_ENV'] ||= 'test'
-require_relative '../config/environment'
-# Prevent database truncation if the environment is production
-abort("The Rails environment is running in production mode!") if Rails.env.production?
-require 'rspec/rails'
-# Add additional requires below this line. Rails is not loaded until this point!
+# このファイルは、'rails generate rspec:install' を実行した際に 
+# 'spec/' ディレクトリにコピーされる設定ファイルです。
 
-# support配下のファイルを自動で読み込む
+# RSpecの基本設定ファイルを読み込む
+require 'spec_helper'
+
+# Railsの環境変数を設定します。
+# 'RAILS_ENV' が未設定なら 'test' 環境をデフォルトにします。
+ENV['RAILS_ENV'] ||= 'test'
+
+# Railsアプリケーションの環境設定ファイルを読み込みます。
+require_relative '../config/environment'
+
+# 安全性チェック: 万が一、テスト環境ではなく本番環境で実行しようとした場合、
+# データベースを守るためにテストを中断します。
+abort("The Rails environment is running in production mode!") if Rails.env.production?
+
+# RSpecをRailsプロジェクトで使うための設定を読み込みます。
+require 'rspec/rails'
+
+# 追加のrequireはここより下に書きます。
+# Railsが完全に読み込まれてから必要なものを追加します。
+
+# サポートファイルの自動読み込み設定
+# 'spec/support' ディレクトリ以下のすべての '.rb' ファイルを読み込みます。
+# 'sort' メソッドで順序を整え、 'require' で各ファイルをロードします。
 Dir[Rails.root.join('spec', 'support', '**', '*.rb')].sort.each { |f| require f }
 
+# ここからはテストに関する設定です。
 
-# Requires supporting ruby files with custom matchers and macros, etc, in
-# spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
-# run as spec files by default. This means that files in spec/support that end
-# in _spec.rb will both be required and run as specs, causing the specs to be
-# run twice. It is recommended that you do not name files matching this glob to
-# end with _spec.rb. You can configure this pattern with the --pattern
-# option on the command line or in ~/.rspec, .rspec or `.rspec-local`.
-#
-# The following line is provided for convenience purposes. It has the downside
-# of increasing the boot-up time by auto-requiring all files in the support
-# directory. Alternatively, in the individual `*_spec.rb` files, manually
-# require only the support files necessary.
-#
-# Dir[Rails.root.join('spec', 'support', '**', '*.rb')].sort.each { |f| require f }
+# 'spec/support' 以下のファイルをすべて読み込みますが、
+# '_spec.rb' で終わるファイルはテストとしても実行されるため、二重実行を避ける必要があります。
+# '_spec.rb' を含むファイルは、サポート用ではなくテスト用として個別に記述することを推奨します。
 
-# Checks for pending migrations and applies them before tests are run.
-# If you are not using ActiveRecord, you can remove these lines.
+# マイグレーションのチェックと適用を実施
+# テスト実行前に保留中のマイグレーションがあるかを確認し、エラーが出たら実行を停止します。
 begin
+  # マイグレーションの整合性をチェックする設定（コメントアウトされている）
   # ActiveRecord::Migration.maintain_test_schema!
 rescue ActiveRecord::PendingMigrationError => e
+  # エラー内容を出力し、ステータスコード1で終了します。
   puts e.to_s.strip
   exit 1
 end
 
+# RSpecの設定を開始します。
 RSpec.configure do |config|
-  # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  #config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  # ActiveRecordのフィクスチャを使う場合の設定（デフォルトではコメントアウト）
+  # フィクスチャとは：テストデータを定義しておき、テスト実行時に自動で使用できる仕組み
+  # config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
-  # If you're not using ActiveRecord, or you'd prefer not to run each of your
-  # examples within a transaction, remove the following line or assign false
-  # instead of true.
+  # トランザクションフィクスチャの使用を有効にします（コメントアウトされている）
+  # テスト中にデータベースのロールバックを行い、テストが終了したらデータを元に戻すためのもの
   # config.use_transactional_fixtures = true
 
-  # You can uncomment this line to turn off ActiveRecord support entirely.
+  # ActiveRecordを完全に無効化したい場合の設定（コメントアウトされている）
   # config.use_active_record = false
 
-  # RSpec Rails can automatically mix in different behaviours to your tests
-  # based on their file location, for example enabling you to call `get` and
-  # `post` in specs under `spec/controllers`.
-  #
-  # You can disable this behaviour by removing the line below, and instead
-  # explicitly tag your specs with their type, e.g.:
-  #
-  #     RSpec.describe UsersController, type: :controller do
-  #       # ...
-  #     end
-  #
-  # The different available types are documented in the features, such as in
-  # https://relishapp.com/rspec/rspec-rails/docs
+  # RSpec Railsはファイルのパスに基づいてテストの種類を自動判定します。
+  # 例： 'spec/controllers' フォルダ内なら 'type: :controller' として扱われる
+  # これを有効にしておくことで、テストファイルの書き方が簡単になります。
   config.infer_spec_type_from_file_location!
 
-  # Filter lines from Rails gems in backtraces.
+  # バックトレース（エラー発生時の呼び出し履歴）からRailsの内部コードを除外します。
+  # エラーの原因をより分かりやすく表示するための工夫です。
   config.filter_rails_from_backtrace!
-  # arbitrary gems may also be filtered via:
-  # config.filter_gems_from_backtrace("gem name")
 
-  # ActiveRecordを使わない場合の設定
-config.use_active_record = false
+  # 任意のGemもバックトレースから除外できます。
+  # 例: config.filter_gems_from_backtrace("gem name")
 
+  # ActiveRecordを使わない場合に無効化する設定
+  config.use_active_record = false
 end
