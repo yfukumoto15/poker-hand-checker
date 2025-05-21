@@ -1,5 +1,5 @@
 # GemfileはRailsアプリケーションで使用する外部ライブラリ（Gem）を管理するファイルです。
-# BundlerというツールがGemfileを参照し、指定されたGemをインストール・管理します。
+# BundlerというツールがGemfileを参照し、指定されたGemをインストール・管理します
 
 # GemをダウンロードするためのソースURLを指定
 source "https://rubygems.org"
