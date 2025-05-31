@@ -1,24 +1,57 @@
-# README
+# ポーカーハンドチェッカー
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## 概要
+手札5枚を入力すると、ポーカーの役を判定します。
 
-Things you may want to cover:
+## Webアプリの使い方
+- ローカルで `http://localhost:3000/` にアクセス
+- 手札をスペース区切りで入力（例: `S10 S11 S12 S13 SA`）
+- 入力例：
+  - `S10 S11 S12 S13 SA`（スペードの10, 11, 12, 13, A）
+  - `H10 H11 H12 H13 HA`（ハートの10, 11, 12, 13, A）
+  - `C2 C3 C4 C5 C6`（クラブの2, 3, 4, 5, 6）
+- スート＋数字の順で入力してください（例: `S10`、`H3`、`D12`、`C2`）
+- 区切りはスペースのみ対応しています
 
-* Ruby version
+## APIエンドポイント
+- URL: `http://localhost:3000/api/v1/check`
+- メソッド: `POST`
+- Content-Type: `application/json`
+- リクエスト例:
+  ```json
+  { "cards": ["S10", "S11", "S12", "S13", "SA"] }
+  ```
+- レスポンス例:
+  ```json
+  { "result": "ロイヤルストレートフラッシュ" }
+  ```
 
-* System dependencies
+### 入力仕様
+- スート: S（スペード）, H（ハート）, D（ダイヤ）, C（クラブ）
+- 数字: A, K, Q, J, 10, 9, ..., 2
+- 入力例: `S10`（スペードの10）, `H3`（ハートの3）, `D12`（ダイヤの12）, `C2`（クラブの2）
+- 区切り: スペース
+- 5枚ちょうど入力してください
 
-* Configuration
+### エラーメッセージ例
+- 「カードが5枚ではありません」
+- 「不正なカードがあります: P1, 1C」
+- 「重複しているカードがあります」
+- 「入力がありません。手札5枚を入力してください」
+- 複数のエラーがある場合はすべて表示されます
 
-* Database creation
+### 注意事項
+- 出力される手札やエラーメッセージに余計な空白が含まれないように注意してください
+- 入力例をコピペしてもエラーにならないように設計されています
 
-* Database initialization
+---
 
-* How to run the test suite
+## 開発・テスト
+- Rubyバージョン: 3.2.8
+- Railsバージョン: 8.0.2
+- テスト実行: `bundle exec rspec`
 
-* Services (job queues, cache servers, search engines, etc.)
+---
 
-* Deployment instructions
-
-* ...
+## 参考
+- [仕様書](https://docs.google.com/presentation/d/1sj_A330Ei4CSqTKJxJ7EKiVe8HBWkDPQ8D6UPKHuJzM/edit?slide=id.g23131edd30c_0_223)

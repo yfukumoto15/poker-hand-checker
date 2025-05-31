@@ -1,100 +1,136 @@
 # ポーカー役を判定するクラス
 class PokerHandChecker
-  # カード配列を受け取る
+  SUITS = %w[S H D C].freeze
+  RANKS = %w[A K Q J 10 9 8 7 6 5 4 3 2].freeze
+  RANK_TO_NUM = {"A"=>14, "K"=>13, "Q"=>12, "J"=>11, "10"=>10, "9"=>9, "8"=>8, "7"=>7, "6"=>6, "5"=>5, "4"=>4, "3"=>3, "2"=>2}
+
+  attr_reader :errors
+
   def initialize(cards)
     @cards = cards
+    @errors = []
+    validate_cards
   end
 
-  # 最も強い役から順に判定
+  def valid?
+    @errors.empty?
+  end
+
   def check_hand
+    return { errors: @errors } unless valid?
+    # 役判定
     if royal_straight_flush?
-      "ロイヤルストレートフラッシュ"
+      { result: "ロイヤルストレートフラッシュ" }
     elsif straight_flush?
-      "ストレートフラッシュ"
+      { result: "ストレートフラッシュ" }
     elsif four_of_a_kind?
-      "フォーカード"
+      { result: "フォーカード" }
     elsif full_house?
-      "フルハウス"
+      { result: "フルハウス" }
     elsif flush?
-      "フラッシュ"
+      { result: "フラッシュ" }
     elsif straight?
-      "ストレート"
+      { result: "ストレート" }
     elsif three_of_a_kind?
-      "スリーカード"
+      { result: "スリーカード" }
     elsif two_pair?
-      "ツーペア"
+      { result: "ツーペア" }
     elsif one_pair?
-      "ワンペア"
+      { result: "ワンペア" }
     else
-      "ハイカード"
+      { result: "ハイカード" }
     end
   end
 
   private
 
-  # ロイヤルストレートフラッシュ（A〜10、同一スート）
-  def royal_straight_flush?
-    flush? && @cards.map { |card| convert_to_number(card.chop) }.sort == [10, 11, 12, 13, 14]
+  def validate_cards
+    if @cards.nil? || @cards.empty? || @cards.all? { |c| c.strip.empty? }
+      @errors << "入力がありません。手札5枚を入力してください"
+      return
+    end
+    if @cards.size != 5
+      @errors << "カードが5枚ではありません"
+    end
+    # スペース区切り以外や余計な空白の検出
+    if @cards.any? { |c| c.match?(/,|　/) || c.strip != c }
+      @errors << "カードの区切りは半角スペースのみ対応しています"
+    end
+    # スート＋数字順のみ許容（A,K,Q,J,10,9,...,2 のみ）
+    invalid_format = @cards.select { |c| c !~ /\A[S|H|D|C](A|K|Q|J|10|[2-9])\z/ }
+    unless invalid_format.empty?
+      @errors << "不正なカードがあります: #{invalid_format.join(', ')}"
+    end
+    # 重複カード
+    dups = @cards.group_by(&:itself).select { |_, v| v.size > 1 }.keys
+    unless dups.empty?
+      @errors << "重複しているカードがあります: #{dups.join(', ')}"
+    end
   end
 
-  # ストレートフラッシュ（連番かつ同一スート）
+  def suit(card)
+    card[0]
+  end
+
+  def rank(card)
+    card[1..-1]
+  end
+
+  def numbers
+    nums = @cards.map { |card| RANK_TO_NUM[rank(card)] }.sort
+    # ストレート判定用: A2345も考慮
+    if nums == [2,3,4,5,14]
+      [1,2,3,4,5]
+    else
+      nums
+    end
+  end
+
+  def suits
+    @cards.map { |card| suit(card) }
+  end
+
+  def royal_straight_flush?
+    flush? && numbers == [10,11,12,13,14]
+  end
+
   def straight_flush?
     flush? && straight?
   end
 
-  # フォーカード（同ランク4枚）
   def four_of_a_kind?
-    card_counts.values.include?(4)
+    rank_counts.values.include?(4)
   end
 
-  # フルハウス（3枚+2枚）
   def full_house?
-    card_counts.values.sort == [2, 3]
+    vals = rank_counts.values.sort
+    vals == [2,3]
   end
 
-  # フラッシュ（全て同一スート）
   def flush?
-    suits = @cards.map { |card| card[-1] }
     suits.uniq.size == 1
   end
 
-  # ストレート（連番5枚）
   def straight?
-    numbers = @cards.map { |card| convert_to_number(card.chop) }.sort
-    numbers == (numbers.first..numbers.first + 4).to_a
+    ns = numbers
+    ns.uniq.size == 5 && ns.max - ns.min == 4
   end
 
-  # スリーカード（同ランク3枚）
   def three_of_a_kind?
-    card_counts.values.include?(3)
+    rank_counts.values.count(3) == 1 && rank_counts.values.count(2) == 0
   end
 
-  # ツーペア（2枚+2枚）
   def two_pair?
-    card_counts.values.count(2) == 2
+    rank_counts.values.count(2) == 2
   end
 
-  # ワンペア（2枚）
   def one_pair?
-    card_counts.values.count(2) == 1
+    rank_counts.values.count(2) == 1
   end
 
-  # 各ランクの出現数をカウント
-  def card_counts
+  def rank_counts
     counts = Hash.new(0)
-    @cards.each { |card| counts[card.chop] += 1 }
+    @cards.each { |card| counts[rank(card)] += 1 }
     counts
-  end
-
-  # ランク文字列を数値に変換
-  def convert_to_number(num)
-    case num
-    when "A" then 14
-    when "K" then 13
-    when "Q" then 12
-    when "J" then 11
-    when "10" then 10
-    else num.to_i
-    end
   end
 end

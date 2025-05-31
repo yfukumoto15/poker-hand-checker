@@ -5,85 +5,160 @@ require 'rails_helper'
 RSpec.describe PokerHandChecker do
   describe '#check_hand' do
 
-    context 'when the hand is a Royal Straight Flush' do
-      it 'returns ロイヤルストレートフラッシュ' do
-        cards = ['10S', 'JS', 'QS', 'KS', 'AS']
+    context 'ロイヤルストレートフラッシュ' do
+      it '正しく判定される' do
+        cards = ['S10', 'SJ', 'SQ', 'SK', 'SA']
         checker = PokerHandChecker.new(cards)
-        expect(checker.check_hand).to eq("ロイヤルストレートフラッシュ")
+        expect(checker.check_hand[:result]).to eq('ロイヤルストレートフラッシュ')
       end
     end
 
-    context 'when the hand is a Straight Flush' do
-      it 'returns ストレートフラッシュ' do
-        cards = ['9H', '10H', 'JH', 'QH', 'KH']
+    context 'ストレートフラッシュ' do
+      it '正しく判定される' do
+        cards = ['H9', 'H10', 'HJ', 'HQ', 'HK']
         checker = PokerHandChecker.new(cards)
-        expect(checker.check_hand).to eq("ストレートフラッシュ")
+        expect(checker.check_hand[:result]).to eq('ストレートフラッシュ')
       end
     end
 
-    context 'when the hand is Four of a Kind' do
-      it 'returns フォーカード' do
-        cards = ['10D', '10S', '10H', '10C', '3D']
+    context 'フォーカード' do
+      it '正しく判定される' do
+        cards = ['D10', 'S10', 'H10', 'C10', 'D3']
         checker = PokerHandChecker.new(cards)
-        expect(checker.check_hand).to eq("フォーカード")
+        expect(checker.check_hand[:result]).to eq('フォーカード')
       end
     end
 
-    context 'when the hand is Full House' do
-      it 'returns フルハウス' do
-        cards = ['5D', '5S', '5H', '3C', '3D']
+    context 'フルハウス' do
+      it '正しく判定される' do
+        cards = ['SQ', 'DQ', 'HQ', 'C4', 'H4']
         checker = PokerHandChecker.new(cards)
-        expect(checker.check_hand).to eq("フルハウス")
+        expect(checker.check_hand[:result]).to eq('フルハウス')
       end
     end
 
-    context 'when the hand is a Flush' do
-      it 'returns フラッシュ' do
-        cards = ['2S', '6S', '9S', 'QS', 'KS']
+    context 'フラッシュ' do
+      it '正しく判定される' do
+        cards = ['C2', 'C5', 'C6', 'CQ', 'CK']
         checker = PokerHandChecker.new(cards)
-        expect(checker.check_hand).to eq("フラッシュ")
+        expect(checker.check_hand[:result]).to eq('フラッシュ')
       end
     end
 
-    context 'when the hand is a Straight' do
-      it 'returns ストレート' do
-        cards = ['4D', '5S', '6H', '7C', '8D']
+    context 'ストレート' do
+      it '正しく判定される' do
+        cards = ['D4', 'S5', 'H6', 'C7', 'D8']
         checker = PokerHandChecker.new(cards)
-        expect(checker.check_hand).to eq("ストレート")
+        expect(checker.check_hand[:result]).to eq('ストレート')
       end
     end
 
-    context 'when the hand is Three of a Kind' do
-      it 'returns スリーカード' do
-        cards = ['7D', '7S', '7H', '2C', '4D']
+    context 'スリーカード' do
+      it '正しく判定される' do
+        cards = ['CQ', 'DQ', 'HQ', 'S3', 'C4']
         checker = PokerHandChecker.new(cards)
-        expect(checker.check_hand).to eq("スリーカード")
+        expect(checker.check_hand[:result]).to eq('スリーカード')
       end
     end
 
-    context 'when the hand is Two Pair' do
-      it 'returns ツーペア' do
-        cards = ['8D', '8S', '4H', '4C', '5D']
+    context 'ツーペア' do
+      it '正しく判定される' do
+        cards = ['SK', 'DK', 'C4', 'S4', 'H3']
         checker = PokerHandChecker.new(cards)
-        expect(checker.check_hand).to eq("ツーペア")
+        expect(checker.check_hand[:result]).to eq('ツーペア')
       end
     end
 
-    context 'when the hand is One Pair' do
-      it 'returns ワンペア' do
-        cards = ['3D', '3S', '7H', '9C', 'KD']
+    context 'ワンペア' do
+      it '正しく判定される' do
+        cards = ['D3', 'S3', 'H7', 'C9', 'DK']
         checker = PokerHandChecker.new(cards)
-        expect(checker.check_hand).to eq("ワンペア")
+        expect(checker.check_hand[:result]).to eq('ワンペア')
       end
     end
 
-    context 'when the hand is High Card' do
-      it 'returns ハイカード' do
-        cards = ['2D', '5S', '8H', '9C', 'KD']
+    context 'ハイカード' do
+      it '正しく判定される' do
+        cards = ['S4', 'H5', 'D8', 'H10', 'C2']
         checker = PokerHandChecker.new(cards)
-        expect(checker.check_hand).to eq("ハイカード")
+        expect(checker.check_hand[:result]).to eq('ハイカード')
       end
     end
 
+    context '不正な入力（5枚未満）' do
+      it 'エラーが返る' do
+        cards = ['S10', 'SJ', 'SQ', 'SK']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors]).to include('カードが5枚ではありません')
+      end
+    end
+
+    context '不正なカード（存在しないスート/数字）' do
+      it 'エラーが返る' do
+        cards = ['P1', 'H3', 'H4', 'D9', 'C13']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors].join).to include('不正なカードがあります: P1')
+      end
+    end
+
+    context '重複カード' do
+      it 'エラーが返る' do
+        cards = ['S10', 'S10', 'SQ', 'SK', 'SA']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors].join).to include('重複しているカードがあります: S10')
+      end
+    end
+
+    context '入力なし' do
+      it 'エラーが返る' do
+        cards = []
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors]).to include('入力がありません。手札5枚を入力してください')
+      end
+    end
+
+    describe '追加バリデーション・判定テスト' do
+      it 'カンマ区切りはエラーになる' do
+        cards = ['S10', 'SJ', 'SQ', 'SK,', 'SA']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors].join).to include('カードの区切りは半角スペースのみ対応しています')
+      end
+
+      it '全角スペース区切りはエラーになる' do
+        cards = ['S10', 'SJ', 'SQ', 'SK　', 'SA']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors].join).to include('カードの区切りは半角スペースのみ対応しています')
+      end
+
+      it '前後に余計な空白があるとエラーになる' do
+        cards = [' S10', 'SJ', 'SQ', 'SK', 'SA ']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors].join).to include('カードの区切りは半角スペースのみ対応しています')
+      end
+
+      it '数字＋スート形式はエラーになる' do
+        cards = ['10S', 'JH', 'QS', 'KD', 'AC']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors].join).to include('不正なカードがあります')
+      end
+
+      it '不正なカードが複数ある場合すべて表示される' do
+        cards = ['P1', 'P3', 'H4', 'D9', 'C13']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors].join).to include('不正なカードがあります: P1, P3')
+      end
+
+      it 'A2345はストレートと判定される' do
+        cards = ['S5', 'H4', 'D3', 'C2', 'SA']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:result]).to eq('ストレート')
+      end
+
+      it '11,12,13,1,10の表記も許容される' do
+        cards = ['S11', 'S12', 'S13', 'S1', 'S10']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors].join).to include('不正なカードがあります')
+      end
+    end
   end
 end

@@ -13,9 +13,13 @@ module V1
       end
 
       post do
-        puts "Received cards: #{params[:cards].inspect}"
         checker = PokerHandChecker.new(params[:cards])
-        { result: checker.check_hand }
+        result = checker.check_hand
+        if result[:errors]
+          { errors: result[:errors] }
+        else
+          { result: result[:result] }
+        end
       end
     end
   end
