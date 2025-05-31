@@ -2,14 +2,25 @@
 require 'rails_helper'
 
 # PokerHandChecker のテスト
+# --- 用語解説 ---
+# ・RSpec: Rubyのテスト自動化ツール。describeやitでテスト内容を記述する。
+# ・describe: テスト対象のまとまり（ここではPokerHandCheckerクラスの#check_handメソッド）
+# ・context: 条件ごとにテストをグループ化する（例: ロイヤルストレートフラッシュの場合など）
+# ・it: 1つのテストケース（例: 正しく判定されること）
+# ・expect: 実際の値と期待する値を比較し、テストが通るか判定する。
+# ・checker = PokerHandChecker.new(cards): テスト用の手札を渡して判定クラスを生成
+# ・checker.check_hand: 判定結果（役名やエラー）を取得
+# ・:result, :errors: 判定結果やエラー内容を表すハッシュのキー
+
 RSpec.describe PokerHandChecker do
   describe '#check_hand' do
-
+    # 役ごとにテストケースを分けている
     context 'ロイヤルストレートフラッシュ' do
       it '正しく判定される' do
+        # 例: スペードの10, J, Q, K, A
         cards = ['S10', 'SJ', 'SQ', 'SK', 'SA']
-        checker = PokerHandChecker.new(cards)
-        expect(checker.check_hand[:result]).to eq('ロイヤルストレートフラッシュ')
+        checker = PokerHandChecker.new(cards) # 判定クラスを生成
+        expect(checker.check_hand[:result]).to eq('ロイヤルストレートフラッシュ') # 期待値と比較
       end
     end
 
@@ -85,6 +96,7 @@ RSpec.describe PokerHandChecker do
       end
     end
 
+    # バリデーション（入力チェック）のテスト
     context '不正な入力（5枚未満）' do
       it 'エラーが返る' do
         cards = ['S10', 'SJ', 'SQ', 'SK']
@@ -117,6 +129,7 @@ RSpec.describe PokerHandChecker do
       end
     end
 
+    # 追加のバリデーションや特殊ケースのテスト
     describe '追加バリデーション・判定テスト' do
       it 'カンマ区切りはエラーになる' do
         cards = ['S10', 'SJ', 'SQ', 'SK,', 'SA']
