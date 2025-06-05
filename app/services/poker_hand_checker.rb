@@ -7,9 +7,31 @@ class PokerHandChecker
   attr_reader :errors
 
   def initialize(cards)
-    @cards = cards
+    @raw_cards = cards # 変換前（空白含む）
     @errors = []
+    # バリデーション時は数字表記も許容
     validate_cards
+    # バリデーション後に変換
+    @cards = @raw_cards.map { |c| convert_number_card(c.strip) } if @errors.empty?
+  end
+
+  # 数字表記を英字表記に変換する（例: 1H→AH, 13H→KH, 12H→QH, 11H→JH, 10H→10H）
+  def convert_number_card(card)
+    card = card.strip
+    if card =~ /^(S|H|D|C)(1[0-3]|[1-9])$/
+      suit = card[0]
+      num = card[1..-1]
+      case num
+      when '1' then "#{suit}A"
+      when '11' then "#{suit}J"
+      when '12' then "#{suit}Q"
+      when '13' then "#{suit}K"
+      else
+        "#{suit}#{num}"
+      end
+    else
+      card
+    end
   end
 
   def valid?
@@ -45,26 +67,29 @@ class PokerHandChecker
   private
 
   def validate_cards
-    if @cards.nil? || @cards.empty? || @cards.all? { |c| c.strip.empty? }
+    if @raw_cards.nil? || @raw_cards.empty? || @raw_cards.all? { |c| c.strip.empty? }
       @errors << "入力がありません。手札5枚を入力してください"
       return
     end
-    if @cards.size != 5
+    if @raw_cards.size != 5
       @errors << "カードが5枚ではありません"
     end
     # スペース区切り以外や余計な空白の検出
-    if @cards.any? { |c| c.match?(/,|　/) || c.strip != c }
+    if @raw_cards.any? { |c| c.match?(/,|　/) || c != c.strip }
       @errors << "カードの区切りは半角スペースのみ対応しています"
     end
-    # スート＋数字順のみ許容（A,K,Q,J,10,9,...,2 のみ）
-    invalid_format = @cards.select { |c| c !~ /\A[S|H|D|C](A|K|Q|J|10|[2-9])\z/ }
+    # スート＋数字順のみ許容（A,K,Q,J,10,9,...,2 または 1,11,12,13 も許容）
+    invalid_format = @raw_cards.select { |c| c.strip !~ /\A[S|H|D|C](A|K|Q|J|10|[2-9]|1[0-3]|[1-9])\z/ }
     unless invalid_format.empty?
-      @errors << "不正なカードがあります: #{invalid_format.join(', ')}"
+      @errors << "不正なカードがあります: #{invalid_format.map(&:strip).join(', ')}"
     end
-    # 重複カード
-    dups = @cards.group_by(&:itself).select { |_, v| v.size > 1 }.keys
-    unless dups.empty?
-      @errors << "重複しているカードがあります: #{dups.join(', ')}"
+    # 重複カード（変換後でチェック）
+    if @errors.empty?
+      converted = @raw_cards.map { |c| convert_number_card(c.strip) }
+      dups = converted.group_by(&:itself).select { |_, v| v.size > 1 }.keys
+      unless dups.empty?
+        @errors << "重複しているカードがあります: #{dups.join(', ')}"
+      end
     end
   end
 

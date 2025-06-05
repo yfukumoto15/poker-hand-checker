@@ -1,3 +1,18 @@
+<style>
+  body {
+    background: url('<%= asset_path "casino.png" %>') no-repeat center center fixed;
+    background-size: cover;
+  }
+  .content-wrapper {
+    background: rgba(255,255,255,0.85);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 600px;
+    margin: 40px auto;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+  }
+</style>
+<div class="content-wrapper">
 <h1>ポーカー役判定</h1>
 
 <!-- 入力フォーム -->
@@ -18,3 +33,4 @@
     <p>判定結果: <%= @result %></p>
   <% end %>
 <% end %>
+</div>
