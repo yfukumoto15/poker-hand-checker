@@ -1,5 +1,9 @@
-# RSpecの設定
+# =============================
+# RSpecの設定ファイル
+# サービスクラスのテストで便利なアサーション（検証メソッド）を使えるようにする
+# =============================
+
 RSpec.configure do |config|
-  # サービスクラスのテストでアサーションを使えるようにする
+  # サービスクラスのテストでActiveSupportのアサーション（検証メソッド）を使えるようにする
   config.include ActiveSupport::Testing::Assertions, type: :service
 end

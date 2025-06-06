@@ -1,10 +1,15 @@
+# =============================
+# PokerHandCheckerクラスのテスト
+# RSpecというテスト用フレームワークを使っています
+# =============================
+
 # テスト用設定を読み込む
 require 'rails_helper'
 
 # PokerHandChecker のテスト
 RSpec.describe PokerHandChecker do
   describe '#check_hand' do
-
+    # 役ごとに正しく判定されるかテスト
     context 'ロイヤルストレートフラッシュ' do
       it '正しく判定される' do
         cards = ['S10', 'SJ', 'SQ', 'SK', 'SA']
