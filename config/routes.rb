@@ -8,6 +8,6 @@ Rails.application.routes.draw do
   post "/" => "poker#index"
 
   # Grape APIのマウント（/api/v1/...）
-  mount V1::PokerApi => '/api'
+  mount Api => '/api'
 
 end

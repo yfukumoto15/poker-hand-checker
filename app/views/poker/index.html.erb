@@ -23,7 +23,7 @@
 </form>
 
 <!-- 判定結果表示 -->
-<% if @result %>
+<% if @result && @cards.present? %>
   <p>手札: <%= @cards.join(' ') %></p>
   <% if @result.is_a?(Hash) && @result[:errors] %>
     <p style="color:red;">エラー: <%= @result[:errors].join(' / ') %></p>

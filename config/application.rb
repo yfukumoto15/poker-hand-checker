@@ -11,6 +11,10 @@ module Pokergame
   class Application < Rails::Application
     # APIフォルダを自動読み込み対象に追加
     config.autoload_paths += %W(#{config.root}/app/api)
+    config.eager_load_paths += %W(#{config.root}/app/api)
+    
+    # API クラスを明示的に読み込み
+    config.autoload_lib(ignore: %w(assets tasks))
 
     # Rails 8.0の初期設定を適用
     config.load_defaults 8.0
