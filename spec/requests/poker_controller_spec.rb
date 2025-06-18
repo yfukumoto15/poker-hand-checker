@@ -21,10 +21,10 @@ RSpec.describe "PokerController", type: :request do
       expect(response.body).to include("重複しているカードがあります")
     end
 
-    it "入力なしの場合は何も表示されない" do
+    it "入力なしの場合はエラーが表示される" do
       post "/", params: { cards: "" }
-      expect(response.body).not_to include("判定結果:")
-      expect(response.body).not_to include("エラー:")
+      expect(response.body).to include("エラー")
+      expect(response.body).to include("入力がありません。手札5枚を入力してください")
     end
   end
 end 

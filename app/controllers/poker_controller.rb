@@ -4,14 +4,9 @@ class PokerController < ApplicationController
 
   # "/" にアクセスがあったときに実行される
   def index
-    if params[:cards].present?
-      # スペース区切りでカードを分割
-      @cards = params[:cards].split(' ').map(&:strip)
-      checker = PokerHandChecker.new(@cards)
-      @result = checker.check_hand
-    else
-      @cards = []
-      @result = nil
-    end
+    input = params[:cards].to_s
+    @cards = input.split(' ').map(&:strip)
+    checker = PokerHandChecker.new(@cards)
+    @result = checker.check_hand
   end
 end

@@ -7,11 +7,19 @@ class PokerHandChecker
   attr_reader :errors
 
   def initialize(cards)
-    @raw_cards = cards # 変換前（空白含む）
+    # 入力そのまま保持（全角スペースのバリデーションのため）
+    @raw_cards_input = cards
+    # 全角スペースを半角スペースに正規化（ただしバリデーション前にチェックする）
+    @raw_cards =
+      if cards.is_a?(Array)
+        cards.map { |c| c.strip }
+      elsif cards.is_a?(String)
+        cards.strip.split(' ')
+      else
+        []
+      end
     @errors = []
-    # バリデーション時は数字表記も許容
     validate_cards
-    # バリデーション後に変換
     @cards = @raw_cards.map { |c| convert_number_card(c.strip) } if @errors.empty?
   end
 
@@ -67,6 +75,15 @@ class PokerHandChecker
   private
 
   def validate_cards
+    # 全角スペースが含まれていたら即エラー
+    if @raw_cards_input.is_a?(String) && @raw_cards_input.include?('　')
+      @errors << "カードの区切りは半角スペースのみ対応しています"
+      return
+    elsif @raw_cards_input.is_a?(Array) && @raw_cards_input.any? { |c| c.include?('　') }
+      @errors << "カードの区切りは半角スペースのみ対応しています"
+      return
+    end
+    # 空入力や全角スペースのみの入力もエラー
     if @raw_cards.nil? || @raw_cards.empty? || @raw_cards.all? { |c| c.strip.empty? }
       @errors << "入力がありません。手札5枚を入力してください"
       return
@@ -74,8 +91,8 @@ class PokerHandChecker
     if @raw_cards.size != 5
       @errors << "カードが5枚ではありません"
     end
-    # スペース区切り以外や余計な空白の検出
-    if @raw_cards.any? { |c| c.match?(/,|　/) || c != c.strip }
+    # カード区切りは半角スペースのみ許容（カンマや余計な空白）
+    if @raw_cards.any? { |c| c.match?(/,/) || c != c.strip }
       @errors << "カードの区切りは半角スペースのみ対応しています"
     end
     # スート＋数字順のみ許容（A,K,Q,J,10,9,...,2 または 1,11,12,13 も許容）

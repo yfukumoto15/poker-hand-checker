@@ -115,6 +115,16 @@ RSpec.describe PokerHandChecker do
         checker = PokerHandChecker.new(cards)
         expect(checker.check_hand[:errors]).to include('入力がありません。手札5枚を入力してください')
       end
+      it '全角スペースのみの入力もエラーになる' do
+        cards = ['　', '　', '　', '　', '　']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors]).to include('カードの区切りは半角スペースのみ対応しています')
+      end
+      it '空文字列のみの入力もエラーになる' do
+        cards = [' ', ' ', ' ', ' ', ' ']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors]).to include('入力がありません。手札5枚を入力してください')
+      end
     end
 
     describe '追加バリデーション・判定テスト' do
@@ -130,11 +140,10 @@ RSpec.describe PokerHandChecker do
         expect(checker.check_hand[:errors].join).to include('カードの区切りは半角スペースのみ対応しています')
       end
 
-      it '前後に余計な空白があるとエラーになる' do
+      it '前後に余計な空白があるとエラーにならない' do
         cards = [' S10', 'SJ', 'SQ', 'SK', 'SA ']
         checker = PokerHandChecker.new(cards)
-        # 変換後も余計な空白が残る場合はバリデーションエラーになる
-        expect(checker.check_hand[:errors] || []).to include('カードの区切りは半角スペースのみ対応しています')
+        expect(checker.check_hand[:errors] || []).to eq([])
       end
 
       it '数字＋スート形式はエラーになる' do
@@ -161,13 +170,17 @@ RSpec.describe PokerHandChecker do
         # すべて変換されて正しいカードになるので、エラーは出ない
         expect(checker.check_hand[:result]).to eq('ロイヤルストレートフラッシュ')
       end
-    end
 
-    context '数字表記でもロイヤルストレートフラッシュ' do
-      it '1H,13H,12H,11H,10H でロイヤルストレートフラッシュと判定される' do
+      it '数字表記でもロイヤルストレートフラッシュ' do
         cards = ['H1', 'H13', 'H12', 'H11', 'H10']
         checker = PokerHandChecker.new(cards)
         expect(checker.check_hand[:result]).to eq('ロイヤルストレートフラッシュ')
+      end
+
+      it '全角スペースが混じっていても区切りエラーになる' do
+        cards = ['C7', 'C6', 'C5', 'C4', '　C3']
+        checker = PokerHandChecker.new(cards)
+        expect(checker.check_hand[:errors].join).to include('カードの区切りは半角スペースのみ対応しています')
       end
     end
   end

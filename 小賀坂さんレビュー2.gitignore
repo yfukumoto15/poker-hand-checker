@@ -1,4 +1,3 @@
-
 webアプリ
 	役判定仕様はOK
 	エラー面で何個か改善できるかも。ただ致命的ではない。
@@ -6,8 +5,9 @@ webアプリ
 			こっちは直したい。atoneの保守とかでも必要そう。空データが送られるはどのサービスでも起こるので[kkogasaka.icon]
 		半角スペース以外（全角スペース）が入った場合に、正しいカード（C3）が不正判定される
 			手札: C7 C6 C5 C4 　C3
- 	 エラー: カードの区切りは半角スペースのみ対応しています / 不正なカードがあります: 　C3
+			エラー: カードの区切りは半角スペースのみ対応しています / 不正なカードがあります: 　C3
  			こっちはこの仕様特有（スペースで区切るみたいなやつ）なので致命的ではない[kkogasaka.icon]
+
 
 API
 	マウントが上手くできてなくて、ルーティングできていなさそう
@@ -42,31 +42,31 @@ API
   	> 同じ役の場合は強弱はないものとします。
 		code: app/api/v1/poker_api.rb
 		 # 名前空間V1を定義（バージョン管理などに利用）
-   module V1
-     # Grapeを使ったAPI定義
-     class PokerApi < Grape::API
-       format :json  # レスポンス形式をJSONに指定
-   
-       resource :check do  # /api/v1/check に相当
-         desc 'Check poker hand'
-   
-         # 必須パラメータcards（文字列の配列）を定義
-         params do
-           requires :cards, type: Array[String], desc: 'Card list'
-         end
-   
-         post do
-           checker = PokerHandChecker.new(params[:cards])
-           result = checker.check_hand
-           if result[:errors]
-             { errors: result[:errors] }
-           else
-             { result: result[:result] }
-           end
-         end
-       end
-     end
-   end
+		module V1
+			# Grapeを使ったAPI定義
+			class PokerApi < Grape::API
+			format :json  # レスポンス形式をJSONに指定
+		
+			resource :check do  # /api/v1/check に相当
+				desc 'Check poker hand'
+		
+				# 必須パラメータcards（文字列の配列）を定義
+				params do
+				requires :cards, type: Array[String], desc: 'Card list'
+				end
+		
+				post do
+				checker = PokerHandChecker.new(params[:cards])
+				result = checker.check_hand
+				if result[:errors]
+					{ errors: result[:errors] }
+				else
+					{ result: result[:result] }
+				end
+				end
+			end
+			end
+		end
 
 			今だとchecker.check_handでは単一の入力データに対する役判定しかできない
 				API用にサービス分ける？メソッド分割する？とかを考えられると良さそう
