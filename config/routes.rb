@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   root "poker#index"
 
   # フォーム送信用のPOSTルート
-  post "/" => "poker#index"
+  post "/" => "poker#create"
 
   # Grape APIのマウント（/api/v1/...）
   mount Api => '/api'
